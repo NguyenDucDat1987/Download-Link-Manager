@@ -1,4 +1,4 @@
-# Download Link Manager
+# Download Link Manager Pro
 
 WordPress Plugin quản lý link tải về với trang đếm ngược và hệ thống quảng cáo.
 
