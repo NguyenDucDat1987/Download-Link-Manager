@@ -1,6 +1,6 @@
 # Changelog
 
-## Version 2.0.2 - 2026-01-08
+## Version 2.0.3 - 2026-01-08
 
 ### Thêm mới
 - ✨ Hệ thống quản lý link tải về

@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) exit;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo esc_html($link->title); ?> - Shutdown Computer Time</title>
+    <title><?php echo esc_html($link->title); ?> <!-- Title đặt tại đây --></title>
     <link rel="stylesheet" href="<?php echo DLM_PLUGIN_URL; ?>assets/css/countdown.css">
 </head>
 <body>

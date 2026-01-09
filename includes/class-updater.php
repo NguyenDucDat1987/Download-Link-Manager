@@ -40,7 +40,7 @@ class DLM_Updater {
         
         // PHƯƠNG THỨC 1: Từ GitHub (Miễn phí, dễ dùng)
         $this->update_url = 'https://api.github.com/repos/NguyenDucDat1987/Download-Link-Manager/releases/latest';
-        $this->cache_key = 'dlm_update_' . $this->plugin_slug;
+        $this->cache_key = 'dlm_update_new_v1_' . $this->plugin_slug;
         $this->cache_allowed = true;
         
         // Hooks
