@@ -1,8 +1,14 @@
 <?php
-/**
- * Plugin Auto-Updater
- * Hỗ trợ cập nhật plugin từ GitHub hoặc server riêng
- */
+/*
+Plugin Name: Download Link Manager
+Plugin URI: https://deeaytee.xyz
+Description: Quản lý link tải về với trang đếm ngược và hệ thống quảng cáo.
+Version: 2.0.3
+Author: Đạt Nguyễn (DeeAyTee)
+Author URI: https://deeaytee.xyz
+License: GPL-2.0+
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+*/
 
 if (!defined('ABSPATH')) {
     exit;

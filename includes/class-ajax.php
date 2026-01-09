@@ -1,7 +1,14 @@
 <?php
-/**
- * AJAX Handler
- */
+/*
+Plugin Name: Download Link Manager
+Plugin URI: https://deeaytee.xyz
+Description: Quản lý link tải về với trang đếm ngược và hệ thống quảng cáo.
+Version: 2.0.3
+Author: Đạt Nguyễn (DeeAyTee)
+Author URI: https://deeaytee.xyz
+License: GPL-2.0+
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
+*/
 
 if (!defined('ABSPATH')) {
     exit;
@@ -25,6 +32,7 @@ class DLM_Ajax {
         add_action('wp_ajax_dlm_delete_link', array($this, 'delete_link'));
         
         // Ads
+        add_action('wp_ajax_dlm_toggle_ad_status', array($this, 'toggle_ad_status'));
         add_action('wp_ajax_dlm_save_ad', array($this, 'save_ad'));
         add_action('wp_ajax_dlm_delete_ad', array($this, 'delete_ad'));
         
@@ -32,7 +40,41 @@ class DLM_Ajax {
         add_action('wp_ajax_dlm_track_download', array($this, 'track_download'));
         add_action('wp_ajax_nopriv_dlm_track_download', array($this, 'track_download'));
     }
-    
+    /**
+     * Hàm xử lý bật/tắt nhanh quảng cáo
+     */
+    public function toggle_ad_status() {
+        check_ajax_referer('dlm_nonce', 'nonce');
+        
+        if (!current_user_can('manage_options')) {
+            wp_send_json_error('Permission denied');
+        }
+        
+        $ad_id = isset($_POST['ad_id']) ? intval($_POST['ad_id']) : 0;
+        $status = isset($_POST['status']) ? sanitize_text_field($_POST['status']) : '';
+        
+        if ($ad_id <= 0 || !in_array($status, ['active', 'inactive'])) {
+            wp_send_json_error('Dữ liệu không hợp lệ');
+        }
+        
+        // Update trực tiếp vào DB
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'dlm_ads'; // Đảm bảo tên bảng đúng với setup của bạn
+        
+        $result = $wpdb->update(
+            $table_name,
+            array('status' => $status),
+            array('id' => $ad_id),
+            array('%s'),
+            array('%d')
+        );
+        
+        if ($result !== false) {
+            wp_send_json_success(array('message' => 'Cập nhật thành công'));
+        } else {
+            wp_send_json_error('Lỗi Database');
+        }
+    }
     public function save_link() {
         check_ajax_referer('dlm_nonce', 'nonce');
         

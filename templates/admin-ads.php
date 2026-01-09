@@ -1,13 +1,18 @@
 <?php
 /**
  * Admin Ads Page Template
+ * * Giao diện quản lý các banner quảng cáo trong Admin.
+ *
+ * @package    Download Link Manager
+ * @author     Đạt Nguyễn (DeeAYTee) <https://deeaytee.xyz>
+ * @copyright  2026 DeeAyTee
+ * @license    GPL-2.0+
+ * @version    2.0.3
  */
+
 if (!defined('ABSPATH')) exit;
 
-// Đảm bảo $ads được định nghĩa
-if (!isset($ads)) {
-    $ads = array();
-}
+if (!isset($ads)) { $ads = array(); }
 ?>
 
 <div class="wrap">
@@ -36,33 +41,20 @@ if (!isset($ads)) {
                     <tr>
                         <th><label>URL Hình ảnh: <span style="color:red;">*</span></label></th>
                         <td>
-                            <input type="url" id="ad-image" class="regular-text" placeholder="https://i.imgur.com/example.jpg" required>
-                            <p class="description">
-                                Dán link hình ảnh từ: Imgur, ImgBB, Google Drive, Dropbox, v.v.<br>
-                                <strong>Gợi ý kích thước:</strong><br>
-                                • Header/Footer: 728x90px hoặc 970x90px<br>
-                                • Left/Right: 160x600px hoặc 300x600px<br>
-                                • Before/After Countdown: 300x250px hoặc 336x280px
-                            </p>
+                            <input type="url" id="ad-image" class="regular-text" placeholder="https://..." required>
+                            <p class="description">Gợi ý: Header/Footer (728x90), Left/Right (160x600).</p>
                         </td>
                     </tr>
                     <tr>
-                        <th><label>Link đích (tùy chọn):</label></th>
-                        <td>
-                            <input type="url" id="ad-link" class="regular-text" placeholder="https://example.com">
-                            <p class="description">Link khi click vào quảng cáo (để trống nếu không cần)</p>
-                        </td>
+                        <th><label>Link đích:</label></th>
+                        <td><input type="url" id="ad-link" class="regular-text" placeholder="https://..."></td>
                     </tr>
                     <tr>
-                        <th><label>Chiều rộng:</label></th>
+                        <th><label>Kích thước (Rộng x Cao):</label></th>
                         <td>
-                            <input type="text" id="ad-width" value="100%" placeholder="100%, 300px, 728px...">
-                        </td>
-                    </tr>
-                    <tr>
-                        <th><label>Chiều cao:</label></th>
-                        <td>
-                            <input type="text" id="ad-height" value="auto" placeholder="auto, 90px, 250px...">
+                            <input type="text" id="ad-width" value="100%" placeholder="100%" class="small-text"> 
+                            x 
+                            <input type="text" id="ad-height" value="auto" placeholder="auto" class="small-text">
                         </td>
                     </tr>
                     <tr>
@@ -87,19 +79,16 @@ if (!isset($ads)) {
             <h2>Danh Sách Quảng Cáo</h2>
             
             <?php if (empty($ads)): ?>
-                <div class="notice notice-info">
-                    <p>📝 Chưa có quảng cáo nào. Hãy thêm quảng cáo đầu tiên!</p>
-                </div>
+                <div class="notice notice-info"><p>📝 Chưa có quảng cáo nào.</p></div>
             <?php else: ?>
                 <table class="wp-list-table widefat fixed striped">
                     <thead>
                         <tr>
                             <th width="5%">ID</th>
                             <th width="15%">Vị trí</th>
-                            <th width="30%">Hình ảnh</th>
+                            <th width="25%">Hình ảnh</th>
                             <th width="15%">Kích thước</th>
-                            <th width="15%">Trạng thái</th>
-                            <th width="20%">Thao tác</th>
+                            <th width="20%">Bật/Tắt nhanh</th> <th width="20%">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -108,18 +97,25 @@ if (!isset($ads)) {
                                 <td><strong><?php echo $ad->id; ?></strong></td>
                                 <td><code><?php echo esc_html($ad->position); ?></code></td>
                                 <td>
-                                    <img src="<?php echo esc_url($ad->image_url); ?>" 
-                                         style="max-width:150px;max-height:80px;border:1px solid #ddd;border-radius:4px;"
-                                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'150\' height=\'80\'%3E%3Crect fill=\'%23f0f0f1\' width=\'150\' height=\'80\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23999\'%3ELỗi ảnh%3C/text%3E%3C/svg%3E'">
+                                    <img src="<?php echo esc_url($ad->image_url); ?>" style="max-width:120px;max-height:60px;border-radius:4px;">
                                 </td>
                                 <td><?php echo esc_html($ad->width); ?> × <?php echo esc_html($ad->height); ?></td>
-                                <td>
-                                    <?php if ($ad->status === 'active'): ?>
-                                        <span style="color:#46b450;font-weight:bold;">✅ Đang bật</span>
-                                    <?php else: ?>
-                                        <span style="color:#999;">❌ Đã tắt</span>
-                                    <?php endif; ?>
+                                
+<td>
+                                    <div class="toggle-wrapper">
+                                        <label class="dlm-switch">
+                                            <input type="checkbox" class="toggle-ad-status" 
+                                                   data-id="<?php echo $ad->id; ?>" 
+                                                   <?php checked($ad->status, 'active'); ?>>
+                                            <span class="slider round"></span>
+                                        </label>
+                                        
+                                        <span class="status-label" style="color: <?php echo ($ad->status === 'active') ? '#46b450' : '#999'; ?>;">
+                                            <?php echo ($ad->status === 'active') ? 'Đang bật' : 'Đã tắt'; ?>
+                                        </span>
+                                    </div>
                                 </td>
+                                
                                 <td>
                                     <button class="button button-small edit-ad" 
                                             data-id="<?php echo $ad->id; ?>"
@@ -144,33 +140,8 @@ if (!isset($ads)) {
 
 <div class="dlm-copyright-footer">
     <p>
-        © <?php echo date('Y'); ?> <strong>Download Link Manager Pro</strong> | 
+        © <?php echo date('Y'); ?> <strong>Download Link Manager</strong> | 
         Developed by <a href="https://deeaytee.xyz" target="_blank">Đạt Nguyễn (DeeAyTee)</a> | 
         Version <?php echo DLM_VERSION; ?>
     </p>
 </div>
-
-<style>
-.dlm-copyright-footer {
-    background: #f0f0f1;
-    padding: 20px;
-    text-align: center;
-    margin-top: 30px;
-    border-top: 3px solid #2271b1;
-    border-radius: 4px;
-}
-.dlm-copyright-footer p {
-    margin: 0;
-    color: #50575e;
-    font-size: 13px;
-}
-.dlm-copyright-footer a {
-    color: #2271b1;
-    text-decoration: none;
-    font-weight: 600;
-}
-.dlm-copyright-footer a:hover {
-    color: #135e96;
-    text-decoration: underline;
-}
-</style>

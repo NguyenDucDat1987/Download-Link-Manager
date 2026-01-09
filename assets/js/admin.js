@@ -117,7 +117,51 @@ jQuery(document).ready(function($) {
         });
     });
     
-    // ============= ADS PAGE =============
+// ============= ADS PAGE =============
+    
+    // [MỚI] Xử lý bật/tắt nhanh quảng cáo
+    $('.toggle-ad-status').on('change', function() {
+        const checkbox = $(this);
+        const id = checkbox.data('id');
+        const status = checkbox.is(':checked') ? 'active' : 'inactive';
+        const label = checkbox.closest('td').find('.status-label');
+        
+        // Khóa tạm thời để tránh bấm liên tục
+        checkbox.prop('disabled', true);
+        
+        $.ajax({
+            url: dlmData.ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'dlm_toggle_ad_status', // Tên action bên PHP
+                nonce: dlmData.nonce,
+                ad_id: id,
+                status: status
+            },
+            success: function(response) {
+                checkbox.prop('disabled', false);
+                if (response.success) {
+                    // Cập nhật chữ hiển thị cho đẹp
+                    if (status === 'active') {
+                        label.text('Đang bật').css('color', '#46b450');
+                    } else {
+                        label.text('Đã tắt').css('color', '#999');
+                    }
+                } else {
+                    alert('❌ Lỗi: ' + response.data);
+                    // Lỗi thì trả về trạng thái cũ
+                    checkbox.prop('checked', !status === 'active');
+                }
+            },
+            error: function() {
+                checkbox.prop('disabled', false);
+                alert('❌ Lỗi kết nối server!');
+                checkbox.prop('checked', !status === 'active');
+            }
+        });
+    });
+
+    // ... Các code cũ (Submit form, Edit...) giữ nguyên ở dưới ...
     
     // Submit ad form
     $('#dlm-ad-form').on('submit', function(e) {

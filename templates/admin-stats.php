@@ -1,6 +1,13 @@
 <?php
 /**
  * Admin Stats Page Template
+ * * Giao diện quản lý thống kê lượt tải trong Admin.
+ *
+ * @package    Download Link Manager
+ * @author     Đạt Nguyễn (DeeAYTee) <https://deeaytee.xyz>
+ * @copyright  2026 DeeAyTee
+ * @license    GPL-2.0+
+ * @version    2.0.3
  */
 if (!defined('ABSPATH')) exit;
 ?>
