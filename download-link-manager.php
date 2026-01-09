@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define constants
-define('DLM_VERSION', '2.0.1');
+define('DLM_VERSION', '2.0.3');
 define('DLM_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('DLM_PLUGIN_URL', plugin_dir_url(__FILE__));
 
