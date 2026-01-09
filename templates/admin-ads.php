@@ -1,94 +1,137 @@
 <?php
 /**
- * Admin Links Page Template
+ * Admin Ads Page Template
  */
 if (!defined('ABSPATH')) exit;
+
+// Đảm bảo $ads được định nghĩa
+if (!isset($ads)) {
+    $ads = array();
+}
 ?>
 
 <div class="wrap">
-    <h1>📥 Quản Lý Link Tải Về</h1>
+    <h1>🎯 Quản Lý Quảng Cáo</h1>
     
     <div class="dlm-admin-container">
         <div class="dlm-form-section">
-            <h2>Thêm/Sửa Link</h2>
-            <form id="dlm-link-form">
-                <input type="hidden" id="link-id" value="">
+            <h2>Thêm/Sửa Quảng Cáo</h2>
+            <form id="dlm-ad-form">
+                <input type="hidden" id="ad-id" value="">
                 
                 <table class="form-table">
                     <tr>
-                        <th><label for="link-title">Tiêu đề: <span style="color:red;">*</span></label></th>
-                        <td><input type="text" id="link-title" class="regular-text" required></td>
-                    </tr>
-                    <tr>
-                        <th><label for="download-url">URL Tải về: <span style="color:red;">*</span></label></th>
+                        <th><label>Vị trí: <span style="color:red;">*</span></label></th>
                         <td>
-                            <input type="url" id="download-url" class="regular-text" required>
-                            <p class="description">Link trực tiếp đến file cần tải</p>
+                            <select id="ad-position" class="regular-text" required>
+                                <option value="header">📍 Header (Trên cùng)</option>
+                                <option value="footer">📍 Footer (Dưới cùng)</option>
+                                <option value="left">📍 Left (Bên trái - Sticky)</option>
+                                <option value="right">📍 Right (Bên phải - Sticky)</option>
+                                <option value="before_countdown">📍 Trước đồng hồ đếm ngược</option>
+                                <option value="after_countdown">📍 Sau đồng hồ đếm ngược</option>
+                            </select>
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="password">Mật khẩu giải nén:</label></th>
+                        <th><label>URL Hình ảnh: <span style="color:red;">*</span></label></th>
                         <td>
-                            <input type="text" id="password" class="regular-text">
-                            <p class="description">Để trống nếu không cần mật khẩu</p>
+                            <input type="url" id="ad-image" class="regular-text" placeholder="https://i.imgur.com/example.jpg" required>
+                            <p class="description">
+                                Dán link hình ảnh từ: Imgur, ImgBB, Google Drive, Dropbox, v.v.<br>
+                                <strong>Gợi ý kích thước:</strong><br>
+                                • Header/Footer: 728x90px hoặc 970x90px<br>
+                                • Left/Right: 160x600px hoặc 300x600px<br>
+                                • Before/After Countdown: 300x250px hoặc 336x280px
+                            </p>
                         </td>
                     </tr>
                     <tr>
-                        <th><label for="countdown-time">Thời gian đếm ngược:</label></th>
+                        <th><label>Link đích (tùy chọn):</label></th>
                         <td>
-                            <input type="number" id="countdown-time" value="10" min="1" max="300" style="width:100px;"> giây
+                            <input type="url" id="ad-link" class="regular-text" placeholder="https://example.com">
+                            <p class="description">Link khi click vào quảng cáo (để trống nếu không cần)</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label>Chiều rộng:</label></th>
+                        <td>
+                            <input type="text" id="ad-width" value="100%" placeholder="100%, 300px, 728px...">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label>Chiều cao:</label></th>
+                        <td>
+                            <input type="text" id="ad-height" value="auto" placeholder="auto, 90px, 250px...">
+                        </td>
+                    </tr>
+                    <tr>
+                        <th><label>Trạng thái:</label></th>
+                        <td>
+                            <select id="ad-status">
+                                <option value="active">✅ Kích hoạt</option>
+                                <option value="inactive">❌ Tắt</option>
+                            </select>
                         </td>
                     </tr>
                 </table>
                 
                 <p class="submit">
-                    <button type="submit" class="button button-primary button-large">💾 Lưu Link</button>
-                    <button type="button" id="cancel-edit" class="button button-large" style="display:none;">❌ Hủy</button>
+                    <button type="submit" class="button button-primary button-large">💾 Lưu Quảng Cáo</button>
+                    <button type="button" id="cancel-ad-edit" class="button button-large" style="display:none;">❌ Hủy</button>
                 </p>
             </form>
         </div>
         
         <div class="dlm-list-section">
-            <h2>Danh Sách Link</h2>
+            <h2>Danh Sách Quảng Cáo</h2>
             
-            <?php if (empty($links)): ?>
+            <?php if (empty($ads)): ?>
                 <div class="notice notice-info">
-                    <p>📝 Chưa có link nào. Hãy tạo link đầu tiên!</p>
+                    <p>📝 Chưa có quảng cáo nào. Hãy thêm quảng cáo đầu tiên!</p>
                 </div>
             <?php else: ?>
                 <table class="wp-list-table widefat fixed striped">
                     <thead>
                         <tr>
                             <th width="5%">ID</th>
-                            <th width="20%">Tiêu đề</th>
-                            <th width="25%">Shortcode</th>
-                            <th width="12%">Mật khẩu</th>
-                            <th width="10%">Thời gian</th>
-                            <th width="10%">Lượt tải</th>
-                            <th width="18%">Thao tác</th>
+                            <th width="15%">Vị trí</th>
+                            <th width="30%">Hình ảnh</th>
+                            <th width="15%">Kích thước</th>
+                            <th width="15%">Trạng thái</th>
+                            <th width="20%">Thao tác</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($links as $link): ?>
+                        <?php foreach ($ads as $ad): ?>
                             <tr>
-                                <td><strong><?php echo $link->id; ?></strong></td>
-                                <td><?php echo esc_html($link->title); ?></td>
+                                <td><strong><?php echo $ad->id; ?></strong></td>
+                                <td><code><?php echo esc_html($ad->position); ?></code></td>
                                 <td>
-                                    <code style="background:#f0f0f1;padding:4px 8px;border-radius:4px;font-size:12px;">[download_link id="<?php echo $link->id; ?>"]</code>
-                                    <button class="button button-small copy-shortcode" data-shortcode='[download_link id="<?php echo $link->id; ?>"]' style="margin-left:5px;">📋 Copy</button>
+                                    <img src="<?php echo esc_url($ad->image_url); ?>" 
+                                         style="max-width:150px;max-height:80px;border:1px solid #ddd;border-radius:4px;"
+                                         onerror="this.src='data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'150\' height=\'80\'%3E%3Crect fill=\'%23f0f0f1\' width=\'150\' height=\'80\'/%3E%3Ctext x=\'50%25\' y=\'50%25\' dominant-baseline=\'middle\' text-anchor=\'middle\' fill=\'%23999\'%3ELỗi ảnh%3C/text%3E%3C/svg%3E'">
                                 </td>
+                                <td><?php echo esc_html($ad->width); ?> × <?php echo esc_html($ad->height); ?></td>
                                 <td>
-                                    <?php if ($link->password): ?>
-                                        <span style="color:#46b450;">🔐 Có</span>
+                                    <?php if ($ad->status === 'active'): ?>
+                                        <span style="color:#46b450;font-weight:bold;">✅ Đang bật</span>
                                     <?php else: ?>
-                                        <span style="color:#999;">—</span>
+                                        <span style="color:#999;">❌ Đã tắt</span>
                                     <?php endif; ?>
                                 </td>
-                                <td><?php echo $link->countdown_time; ?>s</td>
-                                <td><strong style="color:#2271b1;"><?php echo number_format($link->total_clicks); ?></strong></td>
                                 <td>
-                                    <button class="button button-small edit-link" data-id="<?php echo $link->id; ?>">✏️ Sửa</button>
-                                    <button class="button button-small delete-link" data-id="<?php echo $link->id; ?>" style="color:#d63638;">🗑️ Xóa</button>
+                                    <button class="button button-small edit-ad" 
+                                            data-id="<?php echo $ad->id; ?>"
+                                            data-position="<?php echo esc_attr($ad->position); ?>"
+                                            data-image="<?php echo esc_attr($ad->image_url); ?>"
+                                            data-link="<?php echo esc_attr($ad->link_url); ?>"
+                                            data-width="<?php echo esc_attr($ad->width); ?>"
+                                            data-height="<?php echo esc_attr($ad->height); ?>"
+                                            data-status="<?php echo esc_attr($ad->status); ?>">
+                                        ✏️ Sửa
+                                    </button>
+                                    <button class="button button-small delete-ad" data-id="<?php echo $ad->id; ?>" style="color:#d63638;">🗑️ Xóa</button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -101,7 +144,7 @@ if (!defined('ABSPATH')) exit;
 
 <div class="dlm-copyright-footer">
     <p>
-        © <?php echo date('Y'); ?> <strong>Download Link Manager</strong> | 
+        © <?php echo date('Y'); ?> <strong>Download Link Manager Pro</strong> | 
         Developed by <a href="https://deeaytee.xyz" target="_blank">Đạt Nguyễn (DeeAyTee)</a> | 
         Version <?php echo DLM_VERSION; ?>
     </p>
