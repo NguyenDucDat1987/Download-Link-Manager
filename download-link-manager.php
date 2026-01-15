@@ -1,79 +1,65 @@
 <?php
 /**
- * Plugin Name: Download Link Manager
- * Plugin URI: https://deeaytee.xyz
- * Description: Quản lý link tải về với trang đếm ngược, quảng cáo và thống kê
- * Version: 2.0.3
- * Author: Đạt Nguyễn (DeeAyTee)
- * Author URI: https://deeaytee.xyz
- * Text Domain: Download-Link-Manager
+ * Plugin Name: Download Link Manager Pro
+ * Plugin URI:  https://deeaytee.xyz/download-link-manager-pro
+ * Description: Plugin quản lý link download với tracking, countdown, password và chống spam.
+ * Version:     2.0.5
+ * Author:      Dat Nguyen (DeeAyTee)
+ * Author URI:  https://deeaytee.xyz
+ * License:     GPL-2.0+
+ * Text Domain: download-link-manager
+ * Domain Path: /languages
  */
 
 if (!defined('ABSPATH')) {
-    exit;
+	exit;
 }
 
-// Define constants
-define('DLM_VERSION', '2.0.3');
+// Define plugin constants
+define('DLM_VERSION', '2.0.5');
 define('DLM_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('DLM_PLUGIN_URL', plugin_dir_url(__FILE__));
 
-// Include required files
-require_once DLM_PLUGIN_DIR . 'includes/class-database.php';
-require_once DLM_PLUGIN_DIR . 'includes/class-admin.php';
-require_once DLM_PLUGIN_DIR . 'includes/class-shortcode.php';
-require_once DLM_PLUGIN_DIR . 'includes/class-countdown.php';
-require_once DLM_PLUGIN_DIR . 'includes/class-ajax.php';
-require_once DLM_PLUGIN_DIR . 'includes/class-updater.php';
+// Autoloader
+require_once DLM_PLUGIN_DIR . 'includes/class-dlm-loader.php';
+require_once DLM_PLUGIN_DIR . 'includes/class-dlm-download-handler.php';
 
-// Create directories on activation
-function dlm_create_directories() {
-    $dirs = array(
-        DLM_PLUGIN_DIR . 'includes',
-        DLM_PLUGIN_DIR . 'templates',
-        DLM_PLUGIN_DIR . 'assets',
-        DLM_PLUGIN_DIR . 'assets/css',
-        DLM_PLUGIN_DIR . 'assets/js'
-    );
-    
-    foreach ($dirs as $dir) {
-        if (!file_exists($dir)) {
-            wp_mkdir_p($dir);
-        }
-    }
+// Initialize the plugin
+function dlm_init_plugin()
+{
+	// GitHub Updater
+	if (is_admin()) {
+		require_once DLM_PLUGIN_DIR . 'includes/class-dlm-updater.php';
+		new DLM_Updater(__FILE__, 'NguyenDucDat1987', 'Download-Link-Manager');
+	}
+
+	$loader = new DLM_Loader();
+	$loader->run();
 }
+add_action('plugins_loaded', 'dlm_init_plugin');
 
-register_activation_hook(__FILE__, 'dlm_create_directories');
+// Activation hook - create download tracking table
+register_activation_hook(__FILE__, 'dlm_activate_plugin');
 
-// Initialize plugin
-class DLM_Plugin {
-    
-    private static $instance = null;
-    
-    public static function get_instance() {
-        if (null === self::$instance) {
-            self::$instance = new self();
-        }
-        return self::$instance;
-    }
-    
-    private function __construct() {
-        // Activation hook
-        register_activation_hook(__FILE__, array('DLM_Database', 'activate'));
-        
-        // Initialize components
-        add_action('plugins_loaded', array($this, 'init'));
-    }
-    
-    public function init() {
-        // Initialize classes
-        DLM_Admin::get_instance();
-        DLM_Shortcode::get_instance();
-        DLM_Countdown::get_instance();
-        DLM_Ajax::get_instance();
-        DLM_Updater::get_instance(); // Auto-update
-    }
+function dlm_activate_plugin()
+{
+	global $wpdb;
+	$table_name = $wpdb->prefix . 'dlm_download_logs';
+	$charset_collate = $wpdb->get_charset_collate();
+
+	$sql = "CREATE TABLE IF NOT EXISTS $table_name (
+		id bigint(20) NOT NULL AUTO_INCREMENT,
+		download_id bigint(20) NOT NULL,
+		ip_address varchar(100) NOT NULL,
+		user_agent varchar(255) DEFAULT NULL,
+		user_id bigint(20) DEFAULT NULL,
+		download_date datetime DEFAULT CURRENT_TIMESTAMP,
+		PRIMARY KEY  (id),
+		KEY download_id (download_id),
+		KEY ip_address (ip_address),
+		KEY download_date (download_date)
+	) $charset_collate;";
+
+	require_once(ABSPATH . 'wp-admin/includes/upgrade.php');
+	dbDelta($sql);
 }
-
-// Start the plugin
-DLM_Plugin::get_instance();
